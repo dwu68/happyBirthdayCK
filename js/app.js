@@ -82,6 +82,76 @@ function init() {
   document.addEventListener('click', startBgm, { once: true });
   buildPhotoStack();
   bindGiftFlow();
+  startStars();
+}
+
+// ============================================================
+//  STAR TWINKLE ANIMATION
+// ============================================================
+function startStars() {
+  const canvas = document.getElementById('star-canvas');
+  const ctx = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width  = canvas.offsetWidth  * window.devicePixelRatio;
+    canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const W = () => canvas.offsetWidth;
+  const H = () => canvas.offsetHeight;
+
+  function makeStar() {
+    return {
+      x:       Math.random() * W(),
+      y:       Math.random() * H(),
+      r:       1.2 + Math.random() * 2.8,
+      phase:   Math.random() * Math.PI * 2,   // twinkle phase offset
+      speed:   0.02 + Math.random() * 0.04,   // twinkle speed
+      // occasional 4-point sparkle vs plain circle
+      sparkle: Math.random() < 0.35,
+    };
+  }
+
+  const STAR_COUNT = 55;
+  const stars = Array.from({ length: STAR_COUNT }, makeStar);
+
+  function drawSparkle(x, y, r, alpha) {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = `rgba(255, 200, 60, ${alpha})`;
+    ctx.lineWidth = r * 0.5;
+    ctx.beginPath();
+    // 4-point cross
+    for (let i = 0; i < 4; i++) {
+      const angle = (i / 4) * Math.PI * 2;
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + Math.cos(angle) * r * 2.2, y + Math.sin(angle) * r * 2.2);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W(), H());
+    stars.forEach(s => {
+      s.phase += s.speed;
+      const alpha = (Math.sin(s.phase) + 1) / 2; // 0 → 1 → 0
+
+      if (s.sparkle) {
+        drawSparkle(s.x, s.y, s.r, alpha * 0.9);
+      }
+      // Core dot
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255, 200, 60, ${alpha * 0.9})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
 }
 
 // ============================================================
@@ -224,6 +294,85 @@ function revealGiftCard() {
   document.getElementById('screen-gift').classList.add('active');
   stopBgm();
   setTimeout(() => new Audio('assets/sounds/anmo.m4a').play(), 500);
+  startPetals();
+}
+
+// ============================================================
+//  PETAL ANIMATION
+// ============================================================
+function startPetals() {
+  const canvas = document.getElementById('petal-canvas');
+  const ctx = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width  = canvas.offsetWidth  * window.devicePixelRatio;
+    canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const W = () => canvas.offsetWidth;
+  const H = () => canvas.offsetHeight;
+
+  // Petal colors — pink tones
+  const COLORS = [
+    'rgba(232,140,165,0.82)',
+    'rgba(247,190,205,0.75)',
+    'rgba(210,100,135,0.70)',
+    'rgba(255,210,220,0.80)',
+    'rgba(240,160,180,0.72)',
+  ];
+
+  // Each petal is an ellipse drawn rotated
+  function makePetal() {
+    return {
+      x:       Math.random() * W(),
+      y:       Math.random() * -H(),        // start above screen
+      vx:      (Math.random() - 0.5) * 0.8, // gentle horizontal drift
+      vy:      0.6 + Math.random() * 1.0,   // fall speed
+      angle:   Math.random() * Math.PI * 2,
+      spin:    (Math.random() - 0.5) * 0.04,
+      rx:      4 + Math.random() * 5,       // petal width radius
+      ry:      2 + Math.random() * 3,       // petal height radius
+      color:   COLORS[Math.floor(Math.random() * COLORS.length)],
+      sway:    Math.random() * Math.PI * 2, // phase for horizontal sway
+      swaySpd: 0.01 + Math.random() * 0.02,
+    };
+  }
+
+  const PETAL_COUNT = 38;
+  const petals = Array.from({ length: PETAL_COUNT }, makePetal);
+  // Spread initial y positions so they don't all arrive at once
+  petals.forEach(p => { p.y = Math.random() * H(); });
+
+  function draw() {
+    ctx.clearRect(0, 0, W(), H());
+    petals.forEach(p => {
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.angle);
+      ctx.beginPath();
+      ctx.ellipse(0, 0, p.rx, p.ry, 0, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+      ctx.restore();
+
+      // Update
+      p.sway += p.swaySpd;
+      p.x    += p.vx + Math.sin(p.sway) * 0.5;
+      p.y    += p.vy;
+      p.angle += p.spin;
+
+      // Recycle when off-screen
+      if (p.y > H() + 20) {
+        p.y  = -20;
+        p.x  = Math.random() * W();
+      }
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
 }
 
 // ============================================================

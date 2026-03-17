@@ -13,8 +13,10 @@
   <!-- SCREEN 1: Photo Stack -->
   <div id="screen-photos" class="screen active">
     <div class="screen-bg"></div>
-    <!-- <p class="hint-text">轻触照片开始 ✨</p> -->
+    <canvas id="star-canvas"></canvas>
+    <p class="stack-number stack-number-top">3</p>
     <div id="photo-stack"></div>
+    <p class="stack-number stack-number-bottom">17</p>
   </div>
 
   <!-- SCREEN 2: Birthday Message + Gift -->
@@ -40,6 +42,7 @@
   <!-- SCREEN 3: Gift Card -->
   <div id="screen-gift" class="screen">
     <div class="screen-bg"></div>
+    <canvas id="petal-canvas"></canvas>
     <div class="gift-card">
       <div class="gift-card-header">
         <img src="assets/photos/gift.png" class="gift-card-img" alt="" />
