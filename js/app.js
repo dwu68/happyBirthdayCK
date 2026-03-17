@@ -40,12 +40,16 @@ const DEFAULT_NOTE = '这一刻，永远珍藏 💗';
 // ============================================================
 //  PASSPHRASE CONFIG
 // ============================================================
-const CORRECT_ANSWER = '来袭';
+const QUESTIONS = [
+  { clue: '💭 谁是世界上最好的宝贝？',               answer: ['王尘康']          },
+  { clue: '💭 谁是世界上最幸福的宝贝？',              answer: ['王尘康', '吴东篱','你','我'] },
+  { clue: '💭 宝贝能不能给我一个头皮的 ___',          answer: ['来袭']            },
+];
+let questionStep = 0;
 
 // ============================================================
 //  STATE
 // ============================================================
-let photoIndex = 0;   // index into the shuffled stack (bottom → top)
 let tapState = 0;     // 0 = waiting for first tap, 1 = enlarged (waiting for second tap)
 let cards = [];       // DOM references ordered bottom → top
 
@@ -54,7 +58,28 @@ let cards = [];       // DOM references ordered bottom → top
 // ============================================================
 document.addEventListener('DOMContentLoaded', init);
 
+// ============================================================
+//  BGM
+// ============================================================
+const bgm = new Audio('assets/sounds/alwaysOnline.m4a');
+bgm.loop = true;
+bgm.volume = 0.5;
+
+// iOS requires audio to start inside a user gesture — start on first tap
+function startBgm() {
+  bgm.play();
+  document.removeEventListener('touchstart', startBgm);
+  document.removeEventListener('click', startBgm);
+}
+
+function stopBgm() {
+  bgm.pause();
+  bgm.currentTime = 0;
+}
+
 function init() {
+  document.addEventListener('touchstart', startBgm, { once: true });
+  document.addEventListener('click', startBgm, { once: true });
   buildPhotoStack();
   bindGiftFlow();
 }
@@ -139,6 +164,7 @@ function handleStackTap(e) {
 function enlargeCard(card) {
   tapState = 1;
   card.classList.add('enlarged');
+  playPhotoOpen();
 
   // Inject note directly inside the card, below the image
   const filename = card.dataset.filename;
@@ -196,6 +222,8 @@ function revealMessage() {
 function revealGiftCard() {
   document.getElementById('screen-message').classList.remove('active');
   document.getElementById('screen-gift').classList.add('active');
+  stopBgm();
+  setTimeout(() => new Audio('assets/sounds/anmo.m4a').play(), 500);
 }
 
 // ============================================================
@@ -212,24 +240,41 @@ function bindGiftFlow() {
 }
 
 function openPassphraseModal() {
-  document.getElementById('passphrase-input').value = '';
-  document.getElementById('passphrase-error').classList.add('hidden');
+  playGiftOpen();
+  questionStep = 0;
+  loadQuestion();
   document.getElementById('modal-passphrase').classList.remove('hidden');
   setTimeout(() => document.getElementById('passphrase-input').focus(), 350);
+}
+
+function loadQuestion() {
+  const q = QUESTIONS[questionStep];
+  document.getElementById('passphrase-input').value = '';
+  document.getElementById('passphrase-error').classList.add('hidden');
+  document.querySelector('#modal-passphrase .modal-clue').textContent = q.clue;
 }
 
 function checkPassphrase() {
   const val = document.getElementById('passphrase-input').value.trim();
   const input = document.getElementById('passphrase-input');
   const error = document.getElementById('passphrase-error');
+  const q = QUESTIONS[questionStep];
 
-  if (val === CORRECT_ANSWER) {
+  if (q.answer.includes(val)) {
+    playSuccess();
+    questionStep++;
+    if (questionStep < QUESTIONS.length) {
+      // Advance to next question
+      loadQuestion();
+      setTimeout(() => input.focus(), 100);
+      return;
+    }
     document.getElementById('modal-passphrase').classList.add('hidden');
     revealGiftCard();
   } else {
+    playError();
     error.classList.remove('hidden');
     input.classList.remove('shake');
-    // Force reflow to restart animation
     void input.offsetWidth;
     input.classList.add('shake');
   }
