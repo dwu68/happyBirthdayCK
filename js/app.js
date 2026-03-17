@@ -107,7 +107,7 @@ function startStars() {
     return {
       x:       Math.random() * W(),
       y:       Math.random() * H(),
-      r:       1.2 + Math.random() * 2.8,
+      r:       2.2 + Math.random() * 4.0,
       phase:   Math.random() * Math.PI * 2,   // twinkle phase offset
       speed:   0.02 + Math.random() * 0.04,   // twinkle speed
       // occasional 4-point sparkle vs plain circle
@@ -121,7 +121,7 @@ function startStars() {
   function drawSparkle(x, y, r, alpha) {
     ctx.save();
     ctx.globalAlpha = alpha;
-    ctx.strokeStyle = `rgba(255, 200, 60, ${alpha})`;
+    ctx.strokeStyle = `rgba(255, 215, 100, ${alpha * 0.45})`;
     ctx.lineWidth = r * 0.5;
     ctx.beginPath();
     // 4-point cross
@@ -146,7 +146,7 @@ function startStars() {
       // Core dot
       ctx.beginPath();
       ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255, 200, 60, ${alpha * 0.9})`;
+      ctx.fillStyle = `rgba(255, 215, 100, ${alpha * 0.45})`;
       ctx.fill();
     });
     requestAnimationFrame(draw);
@@ -223,6 +223,9 @@ function currentTopCard() {
 
 function handleStackTap(e) {
   if (tapState !== 0) return;   // ignore if already enlarged
+
+  // Hide tap hint on first interaction
+  document.getElementById('tap-hint').classList.add('hidden');
 
   const top = currentTopCard();
   if (!top) return;

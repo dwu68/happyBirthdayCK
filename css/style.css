@@ -86,6 +86,30 @@ html, body {
 .stack-number-top    { margin-bottom: 12px; }
 .stack-number-bottom { margin-top: 12px; }
 
+#tap-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  z-index: 30;
+  pointer-events: none;
+  animation: tapBounce 1.4s ease-in-out infinite;
+  transition: opacity 0.4s ease;
+  filter: drop-shadow(0 2px 6px rgba(180,80,110,0.3));
+}
+
+#tap-hint.hidden {
+  opacity: 0;
+}
+
+@keyframes tapBounce {
+  0%, 100% { transform: translate(-50%, -50%) scale(1);    }
+  50%       { transform: translate(-50%, -60%) scale(1.1); }
+}
+
 .hint-text {
   position: relative;
   z-index: 2;
