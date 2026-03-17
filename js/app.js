@@ -9,7 +9,6 @@
 const PHOTOS = [
   '01_fishing.png',
   '02_pool.jpeg',
-  
   '04_NBA.jpeg',
   '05_violin.jpeg',
   '06_cooking.jpeg',
@@ -27,14 +26,13 @@ const PHOTOS = [
 const NOTES = {
   '01_fishing.png':   '钓帝养成中... 🎣',
   '02_pool.jpeg':     '淡定从容的冷面黑马CK！🎱',
-  
   '04_NBA.jpeg':      '声音超好听又超专业的NBA现场记者!！ 🏀',
   '05_violin.jpeg':   '想看宝贝半夜被拍醒拉梁祝哈哈 🎻',
   '06_cooking.jpeg':  '爆炒黄牛肉是世界上最好吃的菜！！ 🍳',
   '07_working.jpeg':  'GP顶梁柱，Tim的心肝大宝贝！  💻',
-  '08_majiang.png':   '麻将之王宝贝！学吧！！ 🀄',
+  '08_majiang.png':   '麻将之王降临！学吧！！ 🀄',
   '03_pokemon.jpeg':  '超级会抓小精灵，满手都是闪光的宝贝！ ✨',
-  '09_yumaoqiu.jpeg': '打球巨帅的宝贝！！ 🏸',
+  '09_yumaoqiu.jpeg': '运动天赋拉满，厉害又帅气的宝贝！ 🏸',
 };
 
 const DEFAULT_NOTE = '这一刻，永远珍藏 💗';
@@ -147,7 +145,7 @@ function enlargeCard(card) {
   const note = NOTES[filename] || DEFAULT_NOTE;
   const noteEl = document.createElement('div');
   noteEl.className = 'inline-note';
-  noteEl.innerHTML = `<p>${note}</p><span>再轻触一下继续 →</span>`;
+  noteEl.innerHTML = `<p>${note}</p><span>→</span>`;
   card.appendChild(noteEl);
 
   // Second tap: anywhere on the enlarged card dismisses it
